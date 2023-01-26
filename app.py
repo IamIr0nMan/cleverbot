@@ -1,11 +1,14 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 import openai
 import random
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 
-# Insert your OpenAI API key here
-openai.api_key = "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"
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 responses = {
     "hi": ["Hello!", "Hi there!", "Hey!"],
