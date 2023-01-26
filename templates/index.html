@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chatbot</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      p {
+        white-space: pre-wrap;
+      }
+      .bot-message {
+        background-color: #e2e2e2 !important;
+      }
+
+      .user-message {
+        background-color: #f2f2f2 !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center mt-4">Cleverbot</h1>
+      <div id="conversation-history" class="bg-light rounded p-2"></div>
+      <form onsubmit="submitForm(event)">
+        <div class="form-group">
+          <div class="input-group mt-5">
+            <input
+              type="text"
+              class="form-control shadow mb-5 bg-body-tertiary"
+              id="user-input"
+              autofocus
+              autocomplete="off"
+              placeholder="Type your message here..."
+            />
+            <div class="input-group-append">
+              <button
+                class="btn btn-outline-secondary shadow mb-5 bg-body-tertiary"
+                type="button"
+                id="submit-btn"
+              >
+                <i class="bi bi-send-fill"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <br />
+      <br />
+    </div>
+    <script>
+      function submitForm(event) {
+        event.preventDefault();
+        var userInput = document.getElementById("user-input").value;
+        var conversationHistory = document.getElementById(
+          "conversation-history"
+        );
+        var submitBtn = document.getElementById("submit-btn");
+        conversationHistory.innerHTML +=
+          "<div class='user-message bg-light rounded p-2 m-2 d-flex align-items-start'>" +
+          "<i class='bi bi-person-fill' style='font-size: 36px; margin-right: 20px;' ></i> <p>" +
+          userInput +
+          "</p></div>";
+        document.getElementById("user-input").value = "";
+        submitBtn.innerHTML =
+          '<span class="spinner-border spinner-border-sm"></span>';
+        submitBtn.setAttribute("disabled", true);
+        fetch("/get_response", {
+          method: "POST",
+          body: JSON.stringify({ user_input: userInput }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.text())
+          .then((data) => {
+            var botResponse = data;
+            conversationHistory.innerHTML +=
+              "<div class='bot-message bg-light rounded p-2 m-2 d-flex align-items-start'>" +
+              "<i class='bi bi-robot' style='font-size: 36px; margin-right: 20px;'></i> <p>" +
+              botResponse +
+              "</p></div>";
+            submitBtn.innerHTML = "<i class='bi bi-send-fill'></i>";
+            submitBtn.removeAttribute("disabled");
+          });
+      }
+    </script>
+  </body>
+</html>
